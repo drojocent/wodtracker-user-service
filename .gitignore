@@ -1,4 +1,5 @@
 
+
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -18,27 +19,55 @@ buildNumber.properties
 .classpath
 =======
 HELP.md
+=======
+# =========================
+# MAVEN / SPRING BOOT
+# =========================
+>>>>>>> c101329 (create)
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+.mvn/
+!**/src/main/**/mvn/
+!**/src/test/**/mvn/
+
+mvnw
+mvnw.cmd
+
+# =========================
+# LOGS / OUTPUT
+# =========================
+*.log
+
+# =========================
+# SYSTEM FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# SPRING TOOL SUITE / ECLIPSE
+# =========================
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# =========================
+# INTELLIJ IDEA
+# =========================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# =========================
+# NETBEANS
+# =========================
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -48,5 +77,13 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# =========================
+# VS CODE
+# =========================
 .vscode/
+
+# =========================
+# ENV / CONFIG SENSITIVE
+# =========================
+.env
+application-local.yml
