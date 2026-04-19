@@ -8,6 +8,10 @@ class WodtrackerUserServiceApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println("TEST EJECUTADO EN GITHUB CI");
+    }
+
+    @Test
+    void mainMethodShouldStartApplication() {
+        WodtrackerUserServiceApplication.main(new String[]{});
     }
 }
