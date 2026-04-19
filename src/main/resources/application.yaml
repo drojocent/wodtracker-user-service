@@ -25,7 +25,7 @@ springdoc:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:}
+    secret: ${JWT_SECRET:V29kVHJhY2tlckRldlNoYXJlZEp3dFNlY3JldEtleTEyMzQ1Njc4OTA=}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
 
 ---
@@ -39,6 +39,10 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data-h2.sql
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
