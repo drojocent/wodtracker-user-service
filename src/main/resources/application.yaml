@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: userservice
+    name: wodtracker-user-service
 
   datasource:
     url: jdbc:h2:mem:userdb
