@@ -22,6 +22,16 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: maven
 
-      - name: Build & Test
-        run: mvn clean verify
+      # 1. Compilación
+      - name: Compile
+        run: mvn clean compile -B
+
+      # 2. Tests
+      - name: Run tests
+        run: mvn test -B -DtrimStackTrace=false
+
+      # 3. Verificación final
+      - name: Verify package
+        run: mvn verify -B
