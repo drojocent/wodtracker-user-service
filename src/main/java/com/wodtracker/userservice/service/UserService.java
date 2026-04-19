@@ -12,7 +12,7 @@ public interface UserService {
 
     UserProfileDTO updateUser(Long id, UserUpdateDTO updateDTO);
 
-    UserProfileDTO getCurrentUserProfile(String email);
+    UserProfileDTO getCurrentUserProfile(Long userId);
 
-    UserProfileDTO updateCurrentUserProfile(String email, UserUpdateDTO updateDTO);
+    UserProfileDTO updateCurrentUserProfile(Long userId, UserUpdateDTO updateDTO);
 }

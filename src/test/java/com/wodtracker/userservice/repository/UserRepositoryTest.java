@@ -1,6 +1,7 @@
 package com.wodtracker.userservice.repository;
 
 import com.wodtracker.userservice.entity.User;
+import com.wodtracker.userservice.entity.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -24,6 +25,7 @@ class UserRepositoryTest {
         user.setEmail("test@example.com");
         user.setPassword("password");
         user.setName("Test User");
+        user.setRole(UserRole.USER);
 
         // When
         User savedUser = userRepository.save(user);
@@ -40,6 +42,7 @@ class UserRepositoryTest {
         user.setEmail("test@example.com");
         user.setPassword("password");
         user.setName("Test User");
+        user.setRole(UserRole.USER);
         userRepository.save(user);
 
         // When
@@ -66,6 +69,7 @@ class UserRepositoryTest {
         user.setEmail("test@example.com");
         user.setPassword("password");
         user.setName("Test User");
+        user.setRole(UserRole.USER);
         userRepository.save(user);
 
         // When

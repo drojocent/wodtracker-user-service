@@ -146,10 +146,10 @@ class UserControllerTest {
     @Test
     void shouldGetCurrentUserSuccessfully() throws Exception {
         UserProfileDTO profileDTO = new UserProfileDTO(1L, "test@example.com", "Test User", 70.0, 175.0);
-        when(userService.getCurrentUserProfile("test@example.com")).thenReturn(profileDTO);
+        when(userService.getCurrentUserProfile(1L)).thenReturn(profileDTO);
 
         mockMvc.perform(get("/users/me")
-                        .principal(() -> "test@example.com"))
+                        .principal(() -> "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("test@example.com"))
                 .andExpect(jsonPath("$.name").value("Test User"));
@@ -160,10 +160,10 @@ class UserControllerTest {
         UserUpdateDTO updateDTO = new UserUpdateDTO("Updated Name", null, 75.0, 180.0);
         UserProfileDTO updatedProfile = new UserProfileDTO(1L, "test@example.com", "Updated Name", 75.0, 180.0);
 
-        when(userService.updateCurrentUserProfile(eq("test@example.com"), any(UserUpdateDTO.class))).thenReturn(updatedProfile);
+        when(userService.updateCurrentUserProfile(eq(1L), any(UserUpdateDTO.class))).thenReturn(updatedProfile);
 
         mockMvc.perform(put("/users/me")
-                        .principal(() -> "test@example.com")
+                        .principal(() -> "1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())

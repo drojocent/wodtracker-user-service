@@ -3,6 +3,7 @@ package com.wodtracker.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wodtracker.userservice.dto.LoginRequestDTO;
 import com.wodtracker.userservice.dto.UserProfileDTO;
+import com.wodtracker.userservice.security.UserPrincipal;
 import com.wodtracker.userservice.service.JwtService;
 import com.wodtracker.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -46,12 +46,17 @@ class AuthControllerTest {
     void shouldLoginSuccessfully() throws Exception {
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
         UserProfileDTO profileDTO = new UserProfileDTO(1L, "test@example.com", "Test User", 70.0, 175.0);
-        User authenticatedUser = new User("test@example.com", "encoded-password", java.util.List.of());
+        UserPrincipal authenticatedUser = new UserPrincipal(
+                1L,
+                "test@example.com",
+                "encoded-password",
+                java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
+        );
 
         when(authenticationManager.authenticate(any())).thenReturn(
                 UsernamePasswordAuthenticationToken.authenticated(authenticatedUser, null, authenticatedUser.getAuthorities())
         );
-        when(userService.getCurrentUserProfile("test@example.com")).thenReturn(profileDTO);
+        when(userService.getCurrentUserProfile(1L)).thenReturn(profileDTO);
         when(jwtService.generateToken(authenticatedUser)).thenReturn("jwt-token");
         when(jwtService.getExpirationMinutes()).thenReturn(60L);
 

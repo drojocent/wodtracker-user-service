@@ -33,7 +33,7 @@ public class UserController {
     @GetMapping("/me")
     @Operation(summary = "Get the authenticated athlete profile", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<UserProfileDTO> getCurrentUser(Principal principal) {
-        UserProfileDTO user = userService.getCurrentUserProfile(principal.getName());
+        UserProfileDTO user = userService.getCurrentUserProfile(parseAuthenticatedUserId(principal));
         return ResponseEntity.ok(user);
     }
 
@@ -43,7 +43,7 @@ public class UserController {
             Principal principal,
             @Valid @RequestBody UserUpdateDTO updateDTO
     ) {
-        UserProfileDTO user = userService.updateCurrentUserProfile(principal.getName(), updateDTO);
+        UserProfileDTO user = userService.updateCurrentUserProfile(parseAuthenticatedUserId(principal), updateDTO);
         return ResponseEntity.ok(user);
     }
 
@@ -59,5 +59,9 @@ public class UserController {
     public ResponseEntity<UserProfileDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO updateDTO) {
         UserProfileDTO user = userService.updateUser(id, updateDTO);
         return ResponseEntity.ok(user);
+    }
+
+    private Long parseAuthenticatedUserId(Principal principal) {
+        return Long.valueOf(principal.getName());
     }
 }

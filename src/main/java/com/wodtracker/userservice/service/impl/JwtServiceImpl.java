@@ -1,8 +1,8 @@
 package com.wodtracker.userservice.service.impl;
 
+import com.wodtracker.userservice.security.UserPrincipal;
 import com.wodtracker.userservice.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -32,7 +33,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserPrincipal userPrincipal) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plusSeconds(expirationMinutes * 60);
 
@@ -40,8 +41,9 @@ public class JwtServiceImpl implements JwtService {
                 .issuer("wodtracker-user-service")
                 .issuedAt(issuedAt)
                 .expiresAt(expiresAt)
-                .subject(userDetails.getUsername())
-                .claim("scope", buildScope(userDetails))
+                .subject(String.valueOf(userPrincipal.getId()))
+                .claim("email", userPrincipal.getUsername())
+                .claim("roles", buildRoles(userPrincipal))
                 .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
@@ -56,5 +58,12 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public long getExpirationMinutes() {
         return expirationMinutes;
+    }
+
+    @Override
+    public List<String> buildRoles(UserPrincipal userPrincipal) {
+        return userPrincipal.getAuthorities().stream()
+                .map(authority -> authority.getAuthority().replace("ROLE_", ""))
+                .toList();
     }
 }

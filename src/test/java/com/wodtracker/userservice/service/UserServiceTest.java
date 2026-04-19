@@ -4,6 +4,7 @@ import com.wodtracker.userservice.dto.UserProfileDTO;
 import com.wodtracker.userservice.dto.UserRegistrationDTO;
 import com.wodtracker.userservice.dto.UserUpdateDTO;
 import com.wodtracker.userservice.entity.User;
+import com.wodtracker.userservice.entity.UserRole;
 import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
@@ -44,7 +45,7 @@ class UserServiceTest {
     void shouldCreateUserSuccessfully() {
         // Given
         UserRegistrationDTO dto = new UserRegistrationDTO("test@example.com", "password", "Test User");
-        User savedUser = new User(1L, "test@example.com", "encoded-password", "Test User", null, null);
+        User savedUser = new User(1L, "test@example.com", "encoded-password", "Test User", UserRole.USER, null, null);
 
         when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
         when(passwordEncoder.encode("password")).thenReturn("encoded-password");
@@ -82,7 +83,7 @@ class UserServiceTest {
     @Test
     void shouldGetUserByIdSuccessfully() {
         // Given
-        User user = new User(1L, "test@example.com", "password", "Test User", 70.0, 175.0);
+        User user = new User(1L, "test@example.com", "password", "Test User", UserRole.USER, 70.0, 175.0);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         // When
@@ -112,9 +113,9 @@ class UserServiceTest {
     @Test
     void shouldUpdateUserSuccessfully() {
         // Given
-        User existingUser = new User(1L, "test@example.com", "password", "Old Name", 60.0, 170.0);
+        User existingUser = new User(1L, "test@example.com", "password", "Old Name", UserRole.USER, 60.0, 170.0);
         UserUpdateDTO updateDTO = new UserUpdateDTO("New Name", null, 75.0, 180.0);
-        User updatedUser = new User(1L, "test@example.com", "password", "New Name", 75.0, 180.0);
+        User updatedUser = new User(1L, "test@example.com", "password", "New Name", UserRole.USER, 75.0, 180.0);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
@@ -148,39 +149,39 @@ class UserServiceTest {
 
     @Test
     void shouldGetCurrentUserProfileSuccessfully() {
-        User user = new User(1L, "test@example.com", "encoded-password", "Test User", 70.0, 175.0);
-        when(userRepository.findByEmailIgnoreCase("test@example.com")).thenReturn(Optional.of(user));
+        User user = new User(1L, "test@example.com", "encoded-password", "Test User", UserRole.USER, 70.0, 175.0);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        UserProfileDTO result = userService.getCurrentUserProfile("test@example.com");
+        UserProfileDTO result = userService.getCurrentUserProfile(1L);
 
         assertThat(result.getEmail()).isEqualTo("test@example.com");
         assertThat(result.getName()).isEqualTo("Test User");
-        verify(userRepository).findByEmailIgnoreCase("test@example.com");
+        verify(userRepository).findById(1L);
     }
 
     @Test
     void shouldUpdateCurrentUserProfileSuccessfully() {
-        User existingUser = new User(1L, "test@example.com", "encoded-password", "Old Name", 60.0, 170.0);
+        User existingUser = new User(1L, "test@example.com", "encoded-password", "Old Name", UserRole.USER, 60.0, 170.0);
         UserUpdateDTO updateDTO = new UserUpdateDTO("New Name", null, 75.0, 180.0);
-        User updatedUser = new User(1L, "test@example.com", "encoded-password", "New Name", 75.0, 180.0);
+        User updatedUser = new User(1L, "test@example.com", "encoded-password", "New Name", UserRole.USER, 75.0, 180.0);
 
-        when(userRepository.findByEmailIgnoreCase("test@example.com")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(userRepository.save(existingUser)).thenReturn(updatedUser);
 
-        UserProfileDTO result = userService.updateCurrentUserProfile("test@example.com", updateDTO);
+        UserProfileDTO result = userService.updateCurrentUserProfile(1L, updateDTO);
 
         assertThat(result.getName()).isEqualTo("New Name");
         assertThat(result.getWeight()).isEqualTo(75.0);
-        verify(userRepository).findByEmailIgnoreCase("test@example.com");
+        verify(userRepository).findById(1L);
         verify(userRepository).save(existingUser);
         verify(passwordEncoder, never()).encode(anyString());
     }
 
     @Test
     void shouldEncodePasswordWhenUpdatingUser() {
-        User existingUser = new User(1L, "test@example.com", "old-encoded-password", "Old Name", 60.0, 170.0);
+        User existingUser = new User(1L, "test@example.com", "old-encoded-password", "Old Name", UserRole.USER, 60.0, 170.0);
         UserUpdateDTO updateDTO = new UserUpdateDTO("New Name", "newPassword123", 75.0, 180.0);
-        User updatedUser = new User(1L, "test@example.com", "new-encoded-password", "New Name", 75.0, 180.0);
+        User updatedUser = new User(1L, "test@example.com", "new-encoded-password", "New Name", UserRole.USER, 75.0, 180.0);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.encode("newPassword123")).thenReturn("new-encoded-password");
@@ -196,15 +197,15 @@ class UserServiceTest {
 
     @Test
     void shouldEncodePasswordWhenUpdatingCurrentUserProfile() {
-        User existingUser = new User(1L, "test@example.com", "old-encoded-password", "Old Name", 60.0, 170.0);
+        User existingUser = new User(1L, "test@example.com", "old-encoded-password", "Old Name", UserRole.USER, 60.0, 170.0);
         UserUpdateDTO updateDTO = new UserUpdateDTO("New Name", "newPassword123", 75.0, 180.0);
-        User updatedUser = new User(1L, "test@example.com", "new-encoded-password", "New Name", 75.0, 180.0);
+        User updatedUser = new User(1L, "test@example.com", "new-encoded-password", "New Name", UserRole.USER, 75.0, 180.0);
 
-        when(userRepository.findByEmailIgnoreCase("test@example.com")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.encode("newPassword123")).thenReturn("new-encoded-password");
         when(userRepository.save(existingUser)).thenReturn(updatedUser);
 
-        UserProfileDTO result = userService.updateCurrentUserProfile("test@example.com", updateDTO);
+        UserProfileDTO result = userService.updateCurrentUserProfile(1L, updateDTO);
 
         assertThat(result.getName()).isEqualTo("New Name");
         verify(passwordEncoder).encode("newPassword123");
