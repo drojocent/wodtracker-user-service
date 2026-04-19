@@ -3,6 +3,7 @@ package com.wodtracker.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wodtracker.userservice.dto.LoginRequestDTO;
 import com.wodtracker.userservice.dto.UserProfileDTO;
+import com.wodtracker.userservice.service.JwtService;
 import com.wodtracker.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,21 +39,29 @@ class AuthControllerTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private JwtService jwtService;
+
     @Test
     void shouldLoginSuccessfully() throws Exception {
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
         UserProfileDTO profileDTO = new UserProfileDTO(1L, "test@example.com", "Test User", 70.0, 175.0);
+        User authenticatedUser = new User("test@example.com", "encoded-password", java.util.List.of());
 
         when(authenticationManager.authenticate(any())).thenReturn(
-                UsernamePasswordAuthenticationToken.authenticated("test@example.com", null, java.util.List.of())
+                UsernamePasswordAuthenticationToken.authenticated(authenticatedUser, null, authenticatedUser.getAuthorities())
         );
         when(userService.getCurrentUserProfile("test@example.com")).thenReturn(profileDTO);
+        when(jwtService.generateToken(authenticatedUser)).thenReturn("jwt-token");
+        when(jwtService.getExpirationMinutes()).thenReturn(60L);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequestDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Authentication successful"))
+                .andExpect(jsonPath("$.accessToken").value("jwt-token"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.expiresInMinutes").value(60))
                 .andExpect(jsonPath("$.user.email").value("test@example.com"));
     }
 

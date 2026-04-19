@@ -31,14 +31,14 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Get the authenticated athlete profile", security = @SecurityRequirement(name = "basicAuth"))
+    @Operation(summary = "Get the authenticated athlete profile", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<UserProfileDTO> getCurrentUser(Principal principal) {
         UserProfileDTO user = userService.getCurrentUserProfile(principal.getName());
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/me")
-    @Operation(summary = "Update the authenticated athlete profile", security = @SecurityRequirement(name = "basicAuth"))
+    @Operation(summary = "Update the authenticated athlete profile", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<UserProfileDTO> updateCurrentUser(
             Principal principal,
             @Valid @RequestBody UserUpdateDTO updateDTO
@@ -48,14 +48,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get a user profile by id")
+    @Operation(summary = "Get a user profile by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<UserProfileDTO> getUser(@PathVariable Long id) {
         UserProfileDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a user profile by id")
+    @Operation(summary = "Update a user profile by id", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<UserProfileDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO updateDTO) {
         UserProfileDTO user = userService.updateUser(id, updateDTO);
         return ResponseEntity.ok(user);

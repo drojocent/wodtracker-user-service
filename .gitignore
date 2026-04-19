@@ -1,6 +1,7 @@
-
-
 target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -9,24 +10,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://maven.apache.org/wrapper/#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
-
-# Eclipse m2e generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-=======
-HELP.md
-=======
-# =========================
-# MAVEN / SPRING BOOT
-# =========================
->>>>>>> c101329 (create)
-target/
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 .mvn/
 !**/src/main/**/mvn/
@@ -35,20 +19,11 @@ target/
 mvnw
 mvnw.cmd
 
-# =========================
-# LOGS / OUTPUT
-# =========================
 *.log
 
-# =========================
-# SYSTEM FILES
-# =========================
 .DS_Store
 Thumbs.db
 
-# =========================
-# SPRING TOOL SUITE / ECLIPSE
-# =========================
 .apt_generated
 .classpath
 .factorypath
@@ -57,17 +32,11 @@ Thumbs.db
 .springBeans
 .sts4-cache
 
-# =========================
-# INTELLIJ IDEA
-# =========================
 .idea/
 *.iws
 *.iml
 *.ipr
 
-# =========================
-# NETBEANS
-# =========================
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -77,13 +46,10 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-# =========================
-# VS CODE
-# =========================
 .vscode/
 
-# =========================
-# ENV / CONFIG SENSITIVE
-# =========================
 .env
+.env.*
+!.env.example
 application-local.yml
+application-local.yaml

@@ -7,6 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoginResponseDTO {
 
-    private String message;
+    private String accessToken;
+    private String tokenType;
+    private long expiresInMinutes;
     private UserProfileDTO user;
 }
