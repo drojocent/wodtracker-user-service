@@ -24,6 +24,7 @@ public class JwtConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtConfig.class);
     private static final int JWT_KEY_SIZE_BYTES = 32;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Bean
     public SecretKey jwtSecretKey(@Value("${security.jwt.secret:}") String secret) {
@@ -47,7 +48,7 @@ public class JwtConfig {
         if (secret == null || secret.isBlank()) {
             LOGGER.warn("JWT_SECRET is not configured. Generating an ephemeral JWT key for local runtime only.");
             byte[] generatedKey = new byte[JWT_KEY_SIZE_BYTES];
-            new SecureRandom().nextBytes(generatedKey);
+            SECURE_RANDOM.nextBytes(generatedKey);
             return generatedKey;
         }
 
