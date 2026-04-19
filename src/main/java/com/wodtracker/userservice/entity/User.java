@@ -25,6 +25,10 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role;
+
     private Double weight;
 
     private Double height;

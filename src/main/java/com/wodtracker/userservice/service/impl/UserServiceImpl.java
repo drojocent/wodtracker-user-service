@@ -57,13 +57,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserProfileDTO getCurrentUserProfile(String email) {
-        return userMapper.toProfileDTO(findUserByEmail(email));
+    public UserProfileDTO getCurrentUserProfile(Long userId) {
+        return userMapper.toProfileDTO(findUserById(userId));
     }
 
     @Override
-    public UserProfileDTO updateCurrentUserProfile(String email, UserUpdateDTO updateDTO) {
-        User user = findUserByEmail(email);
+    public UserProfileDTO updateCurrentUserProfile(Long userId, UserUpdateDTO updateDTO) {
+        User user = findUserById(userId);
         applyUpdates(user, updateDTO);
         return userMapper.toProfileDTO(userRepository.save(user));
     }
@@ -71,12 +71,6 @@ public class UserServiceImpl implements UserService {
     private User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-    }
-
-    private User findUserByEmail(String email) {
-        String normalizedEmail = normalizeEmail(email);
-        return userRepository.findByEmailIgnoreCase(normalizedEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + normalizedEmail));
     }
 
     private void applyUpdates(User user, UserUpdateDTO updateDTO) {

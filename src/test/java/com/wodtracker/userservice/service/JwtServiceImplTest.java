@@ -1,11 +1,11 @@
 package com.wodtracker.userservice.service;
 
 import com.wodtracker.userservice.config.JwtConfig;
+import com.wodtracker.userservice.security.UserPrincipal;
 import com.wodtracker.userservice.service.impl.JwtServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,15 +24,21 @@ class JwtServiceImplTest {
 
     @Test
     void shouldGenerateAndDecodeJwtSuccessfully() {
-        User userDetails = new User("athlete@example.com", "encoded-password", java.util.List.of());
+        UserPrincipal userPrincipal = new UserPrincipal(
+                42L,
+                "athlete@example.com",
+                "encoded-password",
+                java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
 
-        String token = jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(userPrincipal);
         Jwt decodedJwt = jwtService.decodeToken(token);
 
         assertThat(token).isNotBlank();
-        assertThat(decodedJwt.getSubject()).isEqualTo("athlete@example.com");
+        assertThat(decodedJwt.getSubject()).isEqualTo("42");
         assertThat(decodedJwt.getClaimAsString("iss")).isEqualTo("wodtracker-user-service");
-        assertThat(decodedJwt.getClaimAsString("scope")).isEmpty();
+        assertThat(decodedJwt.getClaimAsString("email")).isEqualTo("athlete@example.com");
+        assertThat(decodedJwt.getClaimAsStringList("roles")).containsExactly("ADMIN");
         assertThat(decodedJwt.getIssuedAt()).isNotNull();
         assertThat(decodedJwt.getExpiresAt()).isNotNull();
         assertThat(decodedJwt.getExpiresAt()).isAfter(decodedJwt.getIssuedAt());

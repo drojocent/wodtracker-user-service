@@ -1,21 +1,17 @@
 package com.wodtracker.userservice.service;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.wodtracker.userservice.security.UserPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+
+import java.util.List;
 
 public interface JwtService {
 
-    String generateToken(UserDetails userDetails);
+    String generateToken(UserPrincipal userPrincipal);
 
     Jwt decodeToken(String token);
 
     long getExpirationMinutes();
 
-    default String buildScope(UserDetails userDetails) {
-        return userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .reduce((left, right) -> left + " " + right)
-                .orElse("");
-    }
+    List<String> buildRoles(UserPrincipal userPrincipal);
 }

@@ -3,6 +3,7 @@ package com.wodtracker.userservice.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wodtracker.userservice.dto.UserProfileDTO;
 import com.wodtracker.userservice.dto.UserRegistrationDTO;
+import com.wodtracker.userservice.security.UserPrincipal;
 import com.wodtracker.userservice.service.JwtService;
 import com.wodtracker.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -62,10 +62,15 @@ class JwtSecurityIntegrationTest {
     @Test
     void shouldAllowProtectedEndpointWithValidJwt() throws Exception {
         UserProfileDTO profileDTO = new UserProfileDTO(1L, "athlete@example.com", "Athlete", 72.0, 180.0);
-        when(userService.getCurrentUserProfile("athlete@example.com")).thenReturn(profileDTO);
+        when(userService.getCurrentUserProfile(1L)).thenReturn(profileDTO);
 
         String token = jwtService.generateToken(
-                new User("athlete@example.com", "encoded-password", java.util.List.of())
+                new UserPrincipal(
+                        1L,
+                        "athlete@example.com",
+                        "encoded-password",
+                        java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
+                )
         );
 
         mockMvc.perform(get("/users/me")
@@ -73,5 +78,41 @@ class JwtSecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("athlete@example.com"))
                 .andExpect(jsonPath("$.name").value("Athlete"));
+    }
+
+    @Test
+    void shouldRejectAdminEndpointForRegularUserRole() throws Exception {
+        String token = jwtService.generateToken(
+                new UserPrincipal(
+                        1L,
+                        "athlete@example.com",
+                        "encoded-password",
+                        java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
+                )
+        );
+
+        mockMvc.perform(get("/users/1")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldAllowAdminEndpointForAdminRole() throws Exception {
+        UserProfileDTO profileDTO = new UserProfileDTO(1L, "athlete@example.com", "Athlete", 72.0, 180.0);
+        when(userService.getUserById(1L)).thenReturn(profileDTO);
+
+        String token = jwtService.generateToken(
+                new UserPrincipal(
+                        999L,
+                        "admin@example.com",
+                        "encoded-password",
+                        java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
+
+        mockMvc.perform(get("/users/1")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("athlete@example.com"));
     }
 }

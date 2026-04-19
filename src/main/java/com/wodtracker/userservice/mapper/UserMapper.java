@@ -3,6 +3,7 @@ package com.wodtracker.userservice.mapper;
 import com.wodtracker.userservice.dto.UserProfileDTO;
 import com.wodtracker.userservice.dto.UserRegistrationDTO;
 import com.wodtracker.userservice.entity.User;
+import com.wodtracker.userservice.entity.UserRole;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +14,7 @@ public class UserMapper {
         user.setEmail(normalizedEmail);
         user.setPassword(encodedPassword);
         user.setName(registrationDTO.getName().trim());
+        user.setRole(UserRole.USER);
         user.setWeight(null);
         user.setHeight(null);
         return user;
