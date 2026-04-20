@@ -25,7 +25,7 @@ springdoc:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:V29kVHJhY2tlckRldlNoYXJlZEp3dFNlY3JldEtleTEyMzQ1Njc4OTA=}
+    secret: ${JWT_SECRET}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
 
 ---
