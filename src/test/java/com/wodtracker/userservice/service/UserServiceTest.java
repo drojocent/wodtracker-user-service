@@ -1,10 +1,13 @@
 package com.wodtracker.userservice.service;
 
+import com.wodtracker.userservice.dto.AdminUserRequestDTO;
+import com.wodtracker.userservice.dto.AdminUserResponseDTO;
 import com.wodtracker.userservice.dto.UserProfileDTO;
 import com.wodtracker.userservice.dto.UserRegistrationDTO;
 import com.wodtracker.userservice.dto.UserUpdateDTO;
 import com.wodtracker.userservice.entity.User;
 import com.wodtracker.userservice.entity.UserRole;
+import com.wodtracker.userservice.exception.CannotDeleteCurrentUserException;
 import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
@@ -19,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -66,6 +70,38 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldListUsersForAdmin() {
+        User admin = new User(1L, "admin@example.com", "password", "Admin", UserRole.ADMIN, null, null);
+        User athlete = new User(2L, "user@example.com", "password", "User", UserRole.USER, null, null);
+        when(userRepository.findAll()).thenReturn(List.of(admin, athlete));
+
+        List<AdminUserResponseDTO> result = userService.getAllUsersForAdmin();
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getRole()).isEqualTo(UserRole.ADMIN);
+        assertThat(result.get(1).getEmail()).isEqualTo("user@example.com");
+        verify(userRepository).findAll();
+    }
+
+    @Test
+    void shouldCreateAdminUserWithSelectedRole() {
+        AdminUserRequestDTO dto = new AdminUserRequestDTO("admin@example.com", "password", "Admin User", UserRole.ADMIN);
+        User savedUser = new User(3L, "admin@example.com", "encoded-password", "Admin User", UserRole.ADMIN, null, null);
+
+        when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
+        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        AdminUserResponseDTO result = userService.createUserForAdmin(dto);
+
+        assertThat(result.getId()).isEqualTo(3L);
+        assertThat(result.getRole()).isEqualTo(UserRole.ADMIN);
+        verify(userRepository).existsByEmailIgnoreCase("admin@example.com");
+        verify(passwordEncoder).encode("password");
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Given
         UserRegistrationDTO dto = new UserRegistrationDTO("test@example.com", "password", "Test User");
@@ -78,6 +114,27 @@ class UserServiceTest {
         verify(userRepository).existsByEmailIgnoreCase("test@example.com");
         verify(userRepository, never()).save(any(User.class));
         verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void shouldDeleteUser() {
+        User user = new User(2L, "user@example.com", "password", "User", UserRole.USER, null, null);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+        userService.deleteUser(2L, 1L);
+
+        verify(userRepository).findById(2L);
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void shouldRejectDeletingCurrentUser() {
+        assertThatThrownBy(() -> userService.deleteUser(1L, 1L))
+                .isInstanceOf(CannotDeleteCurrentUserException.class)
+                .hasMessage("Administrators cannot delete their own account");
+
+        verify(userRepository, never()).findById(any());
+        verify(userRepository, never()).delete(any());
     }
 
     @Test

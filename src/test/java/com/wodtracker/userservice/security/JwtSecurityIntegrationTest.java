@@ -115,4 +115,37 @@ class JwtSecurityIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("athlete@example.com"));
     }
+
+    @Test
+    void shouldRejectAdminUsersEndpointForRegularUserRole() throws Exception {
+        String token = jwtService.generateToken(
+                new UserPrincipal(
+                        1L,
+                        "athlete@example.com",
+                        "encoded-password",
+                        java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
+                )
+        );
+
+        mockMvc.perform(get("/admin/users")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldAllowAdminUsersEndpointForAdminRole() throws Exception {
+        when(userService.getAllUsersForAdmin()).thenReturn(java.util.List.of());
+        String token = jwtService.generateToken(
+                new UserPrincipal(
+                        999L,
+                        "admin@example.com",
+                        "encoded-password",
+                        java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"))
+                )
+        );
+
+        mockMvc.perform(get("/admin/users")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+    }
 }
