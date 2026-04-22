@@ -24,6 +24,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, "Email already exists", ex.getMessage(), null);
     }
 
+    @ExceptionHandler(CannotDeleteCurrentUserException.class)
+    public ResponseEntity<ErrorResponse> handleCannotDeleteCurrentUser(CannotDeleteCurrentUserException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid user deletion", ex.getMessage(), null);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication failed", "Invalid email or password", null);

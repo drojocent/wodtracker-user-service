@@ -1,9 +1,12 @@
 package com.wodtracker.userservice.service.impl;
 
+import com.wodtracker.userservice.dto.AdminUserRequestDTO;
+import com.wodtracker.userservice.dto.AdminUserResponseDTO;
 import com.wodtracker.userservice.dto.UserProfileDTO;
 import com.wodtracker.userservice.dto.UserRegistrationDTO;
 import com.wodtracker.userservice.dto.UserUpdateDTO;
 import com.wodtracker.userservice.entity.User;
+import com.wodtracker.userservice.exception.CannotDeleteCurrentUserException;
 import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
@@ -13,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -40,6 +44,37 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toEntity(registrationDTO, encodedPassword, normalizedEmail);
         User savedUser = userRepository.save(user);
         return userMapper.toProfileDTO(savedUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AdminUserResponseDTO> getAllUsersForAdmin() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toAdminResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public AdminUserResponseDTO createUserForAdmin(AdminUserRequestDTO requestDTO) {
+        String normalizedEmail = normalizeEmail(requestDTO.getEmail());
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new EmailAlreadyExistsException("Email already in use: " + normalizedEmail);
+        }
+
+        String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
+        User user = userMapper.toEntity(requestDTO, encodedPassword, normalizedEmail);
+        User savedUser = userRepository.save(user);
+        return userMapper.toAdminResponseDTO(savedUser);
+    }
+
+    @Override
+    public void deleteUser(Long id, Long authenticatedUserId) {
+        if (id.equals(authenticatedUserId)) {
+            throw new CannotDeleteCurrentUserException("Administrators cannot delete their own account");
+        }
+
+        User user = findUserById(id);
+        userRepository.delete(user);
     }
 
     @Override
