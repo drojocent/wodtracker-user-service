@@ -37,7 +37,7 @@ class MailAdminUserEmailServiceTest {
         assertThat(sentMessage.getSubject()).isEqualTo("Tu cuenta de WODTracker ha sido creada");
         assertThat(sentMessage.getText()).contains("Athlete");
         assertThat(sentMessage.getText()).contains("TempPass123!");
-        assertThat(sentMessage.getText()).contains("Te recomendamos cambiarla tras el primer acceso.");
+        assertThat(sentMessage.getText()).contains("te recomendamos cambiar esta contraseña tras tu primer inicio de sesión");
     }
 
     @Test
