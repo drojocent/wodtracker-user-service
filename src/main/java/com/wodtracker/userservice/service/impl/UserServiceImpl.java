@@ -11,6 +11,8 @@ import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
 import com.wodtracker.userservice.repository.UserRepository;
+import com.wodtracker.userservice.service.AdminUserEmailService;
+import com.wodtracker.userservice.service.TemporaryPasswordService;
 import com.wodtracker.userservice.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,11 +28,21 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final TemporaryPasswordService temporaryPasswordService;
+    private final AdminUserEmailService adminUserEmailService;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserServiceImpl(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            UserMapper userMapper,
+            TemporaryPasswordService temporaryPasswordService,
+            AdminUserEmailService adminUserEmailService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.temporaryPasswordService = temporaryPasswordService;
+        this.adminUserEmailService = adminUserEmailService;
     }
 
     @Override
@@ -61,9 +73,11 @@ public class UserServiceImpl implements UserService {
             throw new EmailAlreadyExistsException("Email already in use: " + normalizedEmail);
         }
 
-        String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
+        String temporaryPassword = temporaryPasswordService.generateTemporaryPassword();
+        String encodedPassword = passwordEncoder.encode(temporaryPassword);
         User user = userMapper.toEntity(requestDTO, encodedPassword, normalizedEmail);
         User savedUser = userRepository.save(user);
+        adminUserEmailService.sendTemporaryPasswordEmail(savedUser.getEmail(), savedUser.getName(), temporaryPassword);
         return userMapper.toAdminResponseDTO(savedUser);
     }
 

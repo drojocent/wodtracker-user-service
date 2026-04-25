@@ -85,4 +85,18 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.error").value("Internal server error"))
                 .andExpect(jsonPath("$.message").value("Unexpected error"));
     }
+
+    @Test
+    void shouldHandleEmailDeliveryException() throws Exception {
+        UserRegistrationDTO dto = new UserRegistrationDTO("test@example.com", "password", "Test User");
+        when(userService.createUser(any(UserRegistrationDTO.class)))
+                .thenThrow(new EmailDeliveryException("User could not be created because notification email could not be sent", new RuntimeException("smtp down")));
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.error").value("Email delivery failed"))
+                .andExpect(jsonPath("$.message").value("User could not be created because notification email could not be sent"));
+    }
 }

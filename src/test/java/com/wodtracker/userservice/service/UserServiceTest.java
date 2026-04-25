@@ -8,10 +8,13 @@ import com.wodtracker.userservice.dto.UserUpdateDTO;
 import com.wodtracker.userservice.entity.User;
 import com.wodtracker.userservice.entity.UserRole;
 import com.wodtracker.userservice.exception.CannotDeleteCurrentUserException;
+import com.wodtracker.userservice.exception.EmailDeliveryException;
 import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
 import com.wodtracker.userservice.repository.UserRepository;
+import com.wodtracker.userservice.service.AdminUserEmailService;
+import com.wodtracker.userservice.service.TemporaryPasswordService;
 import com.wodtracker.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +41,12 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private TemporaryPasswordService temporaryPasswordService;
+
+    @Mock
+    private AdminUserEmailService adminUserEmailService;
 
     @Spy
     private UserMapper userMapper;
@@ -85,11 +94,12 @@ class UserServiceTest {
 
     @Test
     void shouldCreateAdminUserWithSelectedRole() {
-        AdminUserRequestDTO dto = new AdminUserRequestDTO("admin@example.com", "password", "Admin User", UserRole.ADMIN);
+        AdminUserRequestDTO dto = new AdminUserRequestDTO("admin@example.com", "Admin User", UserRole.ADMIN);
         User savedUser = new User(3L, "admin@example.com", "encoded-password", "Admin User", UserRole.ADMIN, null, null);
 
         when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
-        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
+        when(temporaryPasswordService.generateTemporaryPassword()).thenReturn("TempPass123!");
+        when(passwordEncoder.encode("TempPass123!")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         AdminUserResponseDTO result = userService.createUserForAdmin(dto);
@@ -97,8 +107,30 @@ class UserServiceTest {
         assertThat(result.getId()).isEqualTo(3L);
         assertThat(result.getRole()).isEqualTo(UserRole.ADMIN);
         verify(userRepository).existsByEmailIgnoreCase("admin@example.com");
-        verify(passwordEncoder).encode("password");
+        verify(temporaryPasswordService).generateTemporaryPassword();
+        verify(passwordEncoder).encode("TempPass123!");
         verify(userRepository).save(any(User.class));
+        verify(adminUserEmailService).sendTemporaryPasswordEmail("admin@example.com", "Admin User", "TempPass123!");
+    }
+
+    @Test
+    void shouldNotKeepAdminUserWhenEmailSendingFails() {
+        AdminUserRequestDTO dto = new AdminUserRequestDTO("admin@example.com", "Admin User", UserRole.ADMIN);
+        User savedUser = new User(3L, "admin@example.com", "encoded-password", "Admin User", UserRole.ADMIN, null, null);
+
+        when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
+        when(temporaryPasswordService.generateTemporaryPassword()).thenReturn("TempPass123!");
+        when(passwordEncoder.encode("TempPass123!")).thenReturn("encoded-password");
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        doThrow(new EmailDeliveryException("User could not be created because notification email could not be sent", new RuntimeException("smtp down")))
+                .when(adminUserEmailService).sendTemporaryPasswordEmail("admin@example.com", "Admin User", "TempPass123!");
+
+        assertThatThrownBy(() -> userService.createUserForAdmin(dto))
+                .isInstanceOf(EmailDeliveryException.class)
+                .hasMessage("User could not be created because notification email could not be sent");
+
+        verify(userRepository).save(any(User.class));
+        verify(adminUserEmailService).sendTemporaryPasswordEmail("admin@example.com", "Admin User", "TempPass123!");
     }
 
     @Test
