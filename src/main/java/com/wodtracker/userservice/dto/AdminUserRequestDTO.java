@@ -19,9 +19,6 @@ public class AdminUserRequestDTO {
     @Size(max = 255, message = "Email must not exceed 255 characters")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    private String password;
-
     @NotBlank(message = "Name is required")
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;

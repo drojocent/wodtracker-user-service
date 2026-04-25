@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
   flyway:
     enabled: false
   datasource:
@@ -14,3 +25,7 @@ security:
   jwt:
     secret: VGVzdFdPRFRyYWNrZXJVc2VyU2VydmljZUp3dFNlY3JldEtleTEyMzQ1Njc4OTA=
     expiration-minutes: 60
+
+app:
+  mail:
+    from: noreply@wodtracker.local

@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid user deletion", ex.getMessage(), null);
     }
 
+    @ExceptionHandler(EmailDeliveryException.class)
+    public ResponseEntity<ErrorResponse> handleEmailDeliveryException(EmailDeliveryException ex) {
+        return buildErrorResponse(HttpStatus.SERVICE_UNAVAILABLE, "Email delivery failed", ex.getMessage(), null);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication failed", "Invalid email or password", null);

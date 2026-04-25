@@ -59,7 +59,6 @@ class AdminUserControllerTest {
     void shouldCreateUserForAdmin() throws Exception {
         AdminUserRequestDTO requestDTO = new AdminUserRequestDTO(
                 "new@example.com",
-                "password123",
                 "New User",
                 UserRole.USER
         );
