@@ -85,12 +85,13 @@ class AdminUserControllerTest {
 
     @Test
     void shouldRejectDeletingCurrentAdmin() throws Exception {
-        doThrow(new CannotDeleteCurrentUserException("Administrators cannot delete their own account"))
+        doThrow(new CannotDeleteCurrentUserException("No es posible eliminar tu propia cuenta"))
                 .when(userService).deleteUser(eq(1L), eq(1L));
 
         mockMvc.perform(delete("/admin/users/1")
                         .principal(() -> "1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Invalid user deletion"));
+                .andExpect(jsonPath("$.error").value("Solicitud no válida"))
+                .andExpect(jsonPath("$.message").value("No es posible eliminar tu propia cuenta"));
     }
 }

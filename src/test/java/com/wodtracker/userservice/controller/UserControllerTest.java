@@ -64,10 +64,10 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Validation failed"))
-                .andExpect(jsonPath("$.validationErrors.email").value("Email is required"))
-                .andExpect(jsonPath("$.validationErrors.password").value("Password is required"))
-                .andExpect(jsonPath("$.validationErrors.name").value("Name is required"));
+                .andExpect(jsonPath("$.error").value("Solicitud no válida"))
+                .andExpect(jsonPath("$.validationErrors.email").value("El correo electronico es obligatorio"))
+                .andExpect(jsonPath("$.validationErrors.password").value("La contraseña es obligatoria"))
+                .andExpect(jsonPath("$.validationErrors.name").value("El nombre es obligatorio"));
     }
 
     @Test
@@ -87,13 +87,13 @@ class UserControllerTest {
     @Test
     void shouldReturnNotFoundWhenUserNotFound() throws Exception {
         // Given
-        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("User not found"));
+        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("No se ha encontrado el usuario solicitado"));
 
         // When & Then
                 mockMvc.perform(get("/users/1"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("User not found"))
-                .andExpect(jsonPath("$.message").value("User not found"));
+                .andExpect(jsonPath("$.error").value("Recurso no encontrado"))
+                .andExpect(jsonPath("$.message").value("No se ha encontrado el usuario solicitado"));
     }
 
     @Test
@@ -119,28 +119,28 @@ class UserControllerTest {
     void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
         // Given
         UserUpdateDTO updateDTO = new UserUpdateDTO("Updated Name", null, 75.0, 180.0);
-        when(userService.updateUser(eq(1L), any(UserUpdateDTO.class))).thenThrow(new UserNotFoundException("User not found"));
+        when(userService.updateUser(eq(1L), any(UserUpdateDTO.class))).thenThrow(new UserNotFoundException("No se ha encontrado el usuario solicitado"));
 
         // When & Then
         mockMvc.perform(put("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDTO)))
+                .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("User not found"));
+                .andExpect(jsonPath("$.error").value("Recurso no encontrado"));
     }
 
     @Test
     void shouldReturnConflictWhenEmailAlreadyExists() throws Exception {
         // Given
         UserRegistrationDTO registrationDTO = new UserRegistrationDTO("existing@example.com", "password", "Test User");
-        when(userService.createUser(any(UserRegistrationDTO.class))).thenThrow(new EmailAlreadyExistsException("Email already in use"));
+        when(userService.createUser(any(UserRegistrationDTO.class))).thenThrow(new EmailAlreadyExistsException("El correo electronico ya está en uso"));
 
         // When & Then
                 mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDTO)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").value("Email already exists"));
+                .andExpect(jsonPath("$.error").value("Conflicto"));
     }
 
     @Test

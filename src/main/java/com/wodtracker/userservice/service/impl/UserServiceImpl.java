@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     public UserProfileDTO createUser(UserRegistrationDTO registrationDTO) {
         String normalizedEmail = normalizeEmail(registrationDTO.getEmail());
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            throw new EmailAlreadyExistsException("Email already in use: " + normalizedEmail);
+            throw new EmailAlreadyExistsException("El correo electronico ya está en uso");
         }
 
         String encodedPassword = passwordEncoder.encode(registrationDTO.getPassword());
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     public AdminUserResponseDTO createUserForAdmin(AdminUserRequestDTO requestDTO) {
         String normalizedEmail = normalizeEmail(requestDTO.getEmail());
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-            throw new EmailAlreadyExistsException("Email already in use: " + normalizedEmail);
+            throw new EmailAlreadyExistsException("El correo electronico ya está en uso");
         }
 
         String temporaryPassword = temporaryPasswordService.generateTemporaryPassword();
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id, Long authenticatedUserId) {
         if (id.equals(authenticatedUserId)) {
-            throw new CannotDeleteCurrentUserException("Administrators cannot delete their own account");
+            throw new CannotDeleteCurrentUserException("No es posible eliminar tu propia cuenta");
         }
 
         User user = findUserById(id);
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
     private User findUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("No se ha encontrado el usuario solicitado"));
     }
 
     private void applyUpdates(User user, UserUpdateDTO updateDTO) {

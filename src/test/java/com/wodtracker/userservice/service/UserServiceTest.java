@@ -13,8 +13,6 @@ import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.mapper.UserMapper;
 import com.wodtracker.userservice.repository.UserRepository;
-import com.wodtracker.userservice.service.AdminUserEmailService;
-import com.wodtracker.userservice.service.TemporaryPasswordService;
 import com.wodtracker.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,12 +120,12 @@ class UserServiceTest {
         when(temporaryPasswordService.generateTemporaryPassword()).thenReturn("TempPass123!");
         when(passwordEncoder.encode("TempPass123!")).thenReturn("encoded-password");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
-        doThrow(new EmailDeliveryException("User could not be created because notification email could not be sent", new RuntimeException("smtp down")))
+        doThrow(new EmailDeliveryException("No se pudo completar la operacion porque no fue posible enviar la notificacion", new RuntimeException("smtp down")))
                 .when(adminUserEmailService).sendTemporaryPasswordEmail("admin@example.com", "Admin User", "TempPass123!");
 
         assertThatThrownBy(() -> userService.createUserForAdmin(dto))
                 .isInstanceOf(EmailDeliveryException.class)
-                .hasMessage("User could not be created because notification email could not be sent");
+                .hasMessage("No se pudo completar la operacion porque no fue posible enviar la notificacion");
 
         verify(userRepository).save(any(User.class));
         verify(adminUserEmailService).sendTemporaryPasswordEmail("admin@example.com", "Admin User", "TempPass123!");
@@ -142,7 +140,7 @@ class UserServiceTest {
         // When & Then
         assertThatThrownBy(() -> userService.createUser(dto))
                 .isInstanceOf(EmailAlreadyExistsException.class)
-                .hasMessage("Email already in use: test@example.com");
+                .hasMessage("El correo electronico ya está en uso");
         verify(userRepository).existsByEmailIgnoreCase("test@example.com");
         verify(userRepository, never()).save(any(User.class));
         verify(passwordEncoder, never()).encode(anyString());
@@ -163,7 +161,7 @@ class UserServiceTest {
     void shouldRejectDeletingCurrentUser() {
         assertThatThrownBy(() -> userService.deleteUser(1L, 1L))
                 .isInstanceOf(CannotDeleteCurrentUserException.class)
-                .hasMessage("Administrators cannot delete their own account");
+                .hasMessage("No es posible eliminar tu propia cuenta");
 
         verify(userRepository, never()).findById(any());
         verify(userRepository, never()).delete(any());
@@ -195,7 +193,7 @@ class UserServiceTest {
         // When & Then
         assertThatThrownBy(() -> userService.getUserById(1L))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("User not found with id: 1");
+                .hasMessage("No se ha encontrado el usuario solicitado");
         verify(userRepository).findById(1L);
     }
 
@@ -231,7 +229,7 @@ class UserServiceTest {
         // When & Then
         assertThatThrownBy(() -> userService.updateUser(1L, updateDTO))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("User not found with id: 1");
+                .hasMessage("No se ha encontrado el usuario solicitado");
         verify(userRepository).findById(1L);
         verify(userRepository, never()).save(any(User.class));
     }
