@@ -75,24 +75,24 @@ class AuthControllerTest {
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
         when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad credentials"));
 
-        mockMvc.perform(post("/auth/login")
+                mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequestDTO)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Authentication failed"))
-                .andExpect(jsonPath("$.message").value("Invalid email or password"));
+                .andExpect(jsonPath("$.error").value("No autorizado"))
+                .andExpect(jsonPath("$.message").value("Credenciales no válidas"));
     }
 
     @Test
     void shouldReturnBadRequestWhenLoginValidationFails() throws Exception {
         LoginRequestDTO invalidRequest = new LoginRequestDTO("", "");
 
-        mockMvc.perform(post("/auth/login")
+                mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Validation failed"))
-                .andExpect(jsonPath("$.validationErrors.email").value("Email is required"))
-                .andExpect(jsonPath("$.validationErrors.password").value("Password is required"));
+                .andExpect(jsonPath("$.error").value("Solicitud no válida"))
+                .andExpect(jsonPath("$.validationErrors.email").value("El correo electronico es obligatorio"))
+                .andExpect(jsonPath("$.validationErrors.password").value("La contraseña es obligatoria"));
     }
 }

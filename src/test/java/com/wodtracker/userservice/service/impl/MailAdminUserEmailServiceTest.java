@@ -4,7 +4,6 @@ import com.wodtracker.userservice.exception.EmailDeliveryException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailSendException;
@@ -47,6 +46,6 @@ class MailAdminUserEmailServiceTest {
 
         assertThatThrownBy(() -> service.sendTemporaryPasswordEmail("athlete@example.com", "Athlete", "TempPass123!"))
                 .isInstanceOf(EmailDeliveryException.class)
-                .hasMessage("User could not be created because notification email could not be sent");
+                .hasMessage("No se pudo completar la operación porque no fue posible enviar la notificacion");
     }
 }

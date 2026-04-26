@@ -33,7 +33,7 @@ public class MailAdminUserEmailService implements AdminUserEmailService {
         try {
             mailSender.send(message);
         } catch (MailException ex) {
-            throw new EmailDeliveryException("User could not be created because notification email could not be sent", ex);
+            throw new EmailDeliveryException("No se pudo completar la operación porque no fue posible enviar la notificacion", ex);
         }
     }
 

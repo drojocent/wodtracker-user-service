@@ -56,7 +56,9 @@ class JwtSecurityIntegrationTest {
     @Test
     void shouldRejectProtectedEndpointWithoutJwt() throws Exception {
         mockMvc.perform(get("/users/me"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("No autorizado"))
+                .andExpect(jsonPath("$.message").value("Debes autenticarte para acceder a este recurso"));
     }
 
     @Test
@@ -93,7 +95,9 @@ class JwtSecurityIntegrationTest {
 
         mockMvc.perform(get("/users/1")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("Acceso denegado"))
+                .andExpect(jsonPath("$.message").value("No tienes permisos para acceder a este recurso"));
     }
 
     @Test
@@ -129,7 +133,9 @@ class JwtSecurityIntegrationTest {
 
         mockMvc.perform(get("/admin/users")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("Acceso denegado"))
+                .andExpect(jsonPath("$.message").value("No tienes permisos para acceder a este recurso"));
     }
 
     @Test

@@ -34,28 +34,28 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldHandleUserNotFoundException() throws Exception {
         // Given
-        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("User not found with id: 1"));
+        when(userService.getUserById(1L)).thenThrow(new UserNotFoundException("No se ha encontrado el usuario solicitado"));
 
         // When & Then
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("User not found"))
-                .andExpect(jsonPath("$.message").value("User not found with id: 1"));
+                .andExpect(jsonPath("$.error").value("Recurso no encontrado"))
+                .andExpect(jsonPath("$.message").value("No se ha encontrado el usuario solicitado"));
     }
 
     @Test
     void shouldHandleEmailAlreadyExistsException() throws Exception {
         // Given
         UserRegistrationDTO dto = new UserRegistrationDTO("test@example.com", "password", "Test User");
-        when(userService.createUser(any(UserRegistrationDTO.class))).thenThrow(new EmailAlreadyExistsException("Email already in use"));
+        when(userService.createUser(any(UserRegistrationDTO.class))).thenThrow(new EmailAlreadyExistsException("El correo electronico ya está en uso"));
 
         // When & Then
-        mockMvc.perform(post("/users")
+                mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").value("Email already exists"))
-                .andExpect(jsonPath("$.message").value("Email already in use"));
+                .andExpect(jsonPath("$.error").value("Conflicto"))
+                .andExpect(jsonPath("$.message").value("El correo electronico ya está en uso"));
     }
 
     @Test
@@ -68,10 +68,11 @@ class GlobalExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Validation failed"))
-                .andExpect(jsonPath("$.validationErrors.email").value("Email is required"))
-                .andExpect(jsonPath("$.validationErrors.password").value("Password is required"))
-                .andExpect(jsonPath("$.validationErrors.name").value("Name is required"));
+                .andExpect(jsonPath("$.error").value("Solicitud no válida"))
+                .andExpect(jsonPath("$.message").value("La solicitud contiene datos no válidos"))
+                .andExpect(jsonPath("$.validationErrors.email").value("El correo electronico es obligatorio"))
+                .andExpect(jsonPath("$.validationErrors.password").value("La contraseña es obligatoria"))
+                .andExpect(jsonPath("$.validationErrors.name").value("El nombre es obligatorio"));
     }
 
     @Test
@@ -80,23 +81,23 @@ class GlobalExceptionHandlerTest {
         when(userService.getUserById(1L)).thenThrow(new RuntimeException("Unexpected error"));
 
         // When & Then
-                mockMvc.perform(get("/users/1"))
+        mockMvc.perform(get("/users/1"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.error").value("Internal server error"))
-                .andExpect(jsonPath("$.message").value("Unexpected error"));
+                .andExpect(jsonPath("$.error").value("Error interno del servidor"))
+                .andExpect(jsonPath("$.message").value("Se ha producido un error interno"));
     }
 
     @Test
     void shouldHandleEmailDeliveryException() throws Exception {
         UserRegistrationDTO dto = new UserRegistrationDTO("test@example.com", "password", "Test User");
         when(userService.createUser(any(UserRegistrationDTO.class)))
-                .thenThrow(new EmailDeliveryException("User could not be created because notification email could not be sent", new RuntimeException("smtp down")));
+                .thenThrow(new EmailDeliveryException("No se pudo completar la operación porque no fue posible enviar la notificacion", new RuntimeException("smtp down")));
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.error").value("Email delivery failed"))
-                .andExpect(jsonPath("$.message").value("User could not be created because notification email could not be sent"));
+                .andExpect(jsonPath("$.error").value("Servicio no disponible"))
+                .andExpect(jsonPath("$.message").value("No se pudo completar la operación porque no fue posible enviar la notificacion"));
     }
 }
