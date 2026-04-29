@@ -1,8 +1,8 @@
 package com.wodtracker.userservice.controller;
 
-import com.wodtracker.userservice.dto.UserProfileDTO;
-import com.wodtracker.userservice.dto.UserRegistrationDTO;
-import com.wodtracker.userservice.dto.UserUpdateDTO;
+import com.wodtracker.userservice.dto.request.UserRegistrationDTO;
+import com.wodtracker.userservice.dto.request.UserUpdateDTO;
+import com.wodtracker.userservice.dto.response.UserProfileDTO;
 import com.wodtracker.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

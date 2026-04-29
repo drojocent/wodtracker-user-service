@@ -1,4 +1,4 @@
-package com.wodtracker.userservice.dto;
+package com.wodtracker.userservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

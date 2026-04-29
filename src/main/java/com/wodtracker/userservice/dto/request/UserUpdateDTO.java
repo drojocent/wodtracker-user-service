@@ -1,4 +1,4 @@
-package com.wodtracker.userservice.dto;
+package com.wodtracker.userservice.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;

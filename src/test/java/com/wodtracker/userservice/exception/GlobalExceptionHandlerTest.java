@@ -2,7 +2,7 @@ package com.wodtracker.userservice.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wodtracker.userservice.controller.UserController;
-import com.wodtracker.userservice.dto.UserRegistrationDTO;
+import com.wodtracker.userservice.dto.request.UserRegistrationDTO;
 import com.wodtracker.userservice.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
