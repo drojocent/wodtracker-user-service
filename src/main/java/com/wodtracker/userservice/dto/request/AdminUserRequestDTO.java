@@ -1,4 +1,4 @@
-package com.wodtracker.userservice.dto;
+package com.wodtracker.userservice.dto.request;
 
 import com.wodtracker.userservice.entity.UserRole;
 import jakarta.validation.constraints.Email;

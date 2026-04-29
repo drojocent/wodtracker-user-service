@@ -1,8 +1,8 @@
 package com.wodtracker.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wodtracker.userservice.dto.AdminUserRequestDTO;
-import com.wodtracker.userservice.dto.AdminUserResponseDTO;
+import com.wodtracker.userservice.dto.request.AdminUserRequestDTO;
+import com.wodtracker.userservice.dto.response.AdminUserResponseDTO;
 import com.wodtracker.userservice.entity.UserRole;
 import com.wodtracker.userservice.exception.CannotDeleteCurrentUserException;
 import com.wodtracker.userservice.service.UserService;

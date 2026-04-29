@@ -1,9 +1,9 @@
 package com.wodtracker.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wodtracker.userservice.dto.UserProfileDTO;
-import com.wodtracker.userservice.dto.UserRegistrationDTO;
-import com.wodtracker.userservice.dto.UserUpdateDTO;
+import com.wodtracker.userservice.dto.response.UserProfileDTO;
+import com.wodtracker.userservice.dto.request.UserRegistrationDTO;
+import com.wodtracker.userservice.dto.request.UserUpdateDTO;
 import com.wodtracker.userservice.exception.EmailAlreadyExistsException;
 import com.wodtracker.userservice.exception.UserNotFoundException;
 import com.wodtracker.userservice.service.UserService;

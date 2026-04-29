@@ -1,8 +1,8 @@
 package com.wodtracker.userservice.controller;
 
-import com.wodtracker.userservice.dto.LoginRequestDTO;
-import com.wodtracker.userservice.dto.LoginResponseDTO;
-import com.wodtracker.userservice.dto.UserProfileDTO;
+import com.wodtracker.userservice.dto.request.LoginRequestDTO;
+import com.wodtracker.userservice.dto.response.LoginResponseDTO;
+import com.wodtracker.userservice.dto.response.UserProfileDTO;
 import com.wodtracker.userservice.security.UserPrincipal;
 import com.wodtracker.userservice.service.JwtService;
 import com.wodtracker.userservice.service.UserService;

@@ -1,9 +1,8 @@
 package com.wodtracker.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wodtracker.userservice.dto.UserProfileDTO;
-import com.wodtracker.userservice.dto.UserRegistrationDTO;
-import com.wodtracker.userservice.security.UserPrincipal;
+import com.wodtracker.userservice.dto.response.UserProfileDTO;
+import com.wodtracker.userservice.dto.request.UserRegistrationDTO;
 import com.wodtracker.userservice.service.JwtService;
 import com.wodtracker.userservice.service.UserService;
 import org.junit.jupiter.api.Test;

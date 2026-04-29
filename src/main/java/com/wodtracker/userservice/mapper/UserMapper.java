@@ -1,9 +1,9 @@
 package com.wodtracker.userservice.mapper;
 
-import com.wodtracker.userservice.dto.AdminUserRequestDTO;
-import com.wodtracker.userservice.dto.AdminUserResponseDTO;
-import com.wodtracker.userservice.dto.UserProfileDTO;
-import com.wodtracker.userservice.dto.UserRegistrationDTO;
+import com.wodtracker.userservice.dto.request.AdminUserRequestDTO;
+import com.wodtracker.userservice.dto.request.UserRegistrationDTO;
+import com.wodtracker.userservice.dto.response.AdminUserResponseDTO;
+import com.wodtracker.userservice.dto.response.UserProfileDTO;
 import com.wodtracker.userservice.entity.User;
 import com.wodtracker.userservice.entity.UserRole;
 import org.springframework.stereotype.Component;

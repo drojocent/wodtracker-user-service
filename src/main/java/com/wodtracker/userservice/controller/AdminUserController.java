@@ -1,7 +1,7 @@
 package com.wodtracker.userservice.controller;
 
-import com.wodtracker.userservice.dto.AdminUserRequestDTO;
-import com.wodtracker.userservice.dto.AdminUserResponseDTO;
+import com.wodtracker.userservice.dto.request.AdminUserRequestDTO;
+import com.wodtracker.userservice.dto.response.AdminUserResponseDTO;
 import com.wodtracker.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

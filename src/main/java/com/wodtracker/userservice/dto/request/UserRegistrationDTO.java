@@ -1,4 +1,4 @@
-package com.wodtracker.userservice.dto;
+package com.wodtracker.userservice.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDTO {
+public class UserRegistrationDTO {
 
     @NotBlank(message = "El correo electronico es obligatorio")
     @Email(message = "El correo electronico no es válido")
@@ -19,4 +19,8 @@ public class LoginRequestDTO {
 
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
+
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
+    private String name;
 }

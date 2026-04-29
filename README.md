@@ -13,24 +13,6 @@ Microservicio REST que gestiona autenticación, perfiles de usuario y administra
 - Validación de entrada
 - Role-based access control
 
-## Stack
-
-- Spring Boot 3.5.13
-- Java 17
-- Spring Security 6
-- Spring Data JPA
-- PostgreSQL 15
-- Flyway para migraciones
-- Lombok
-- SpringDoc OpenAPI (Swagger)
-- Maven
-
-## Requisitos
-
-- Java 17+
-- Maven 3.8.0+
-- PostgreSQL 14+ (para producción)
-- Docker (opcional)
 
 ## Instalación
 
@@ -42,14 +24,6 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=h2"
 ```
 
 Accesible en http://localhost:8080
-
-### Con PostgreSQL
-
-```bash
-psql -U postgres -c "CREATE DATABASE userdb;"
-mvn clean install
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=postgres"
-```
 
 ### Docker
 
@@ -163,4 +137,3 @@ JSON: http://localhost:8080/v3/api-docs
 - CORS configurado
 - Stateless authentication
 - Role-based access control
-- HTTPS recomendado en producción

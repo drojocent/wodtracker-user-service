@@ -1,4 +1,4 @@
-package com.wodtracker.userservice.dto;
+package com.wodtracker.userservice.dto.response;
 
 import com.wodtracker.userservice.entity.UserRole;
 import lombok.AllArgsConstructor;
